@@ -14,15 +14,13 @@ from tools import (
     activate_sleep_mode, activate_guest_mode
 )
 
-# بارگذاری کلید API
 load_dotenv()
 if not os.getenv("GROQ_API_KEY"):
-    raise ValueError("❌ Error: GROQ_API_KEY not found in .env file.")
+    raise ValueError("Error: GROQ_API_KEY not found in .env file.")
 
-# تعریف مدل LLM
 llm = ChatGroq(model="llama3-70b-8192", temperature=0)
+# llm = ChatGroq(model="llama3-8b-8192", temperature=0)   # faster
 
-# تعریف ابزارها
 tools = [
     toggle_light, set_ac_temperature, get_device_status, get_weather,
     get_latest_news, get_current_datetime, change_tv_channel, turn_on_tv,
@@ -30,7 +28,6 @@ tools = [
     activate_sleep_mode, activate_guest_mode
 ]
 
-# ساخت prompt و agent
 prompt_template = """
 You are a powerful and helpful smart home assistant. Your name is Jarvis.
 

@@ -3,110 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Home Assistant</title>
+    <title>Jarvis - AI Smart Home Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-glow-color: rgba(0, 191, 255, 0.8);
+            --secondary-glow-color: rgba(0, 191, 255, 0.5);
+            --background-color: #0a0a0f;
+            --container-bg: rgba(20, 20, 30, 0.75);
+            --text-color: #e0e0e0;
+            --text-muted-color: #888;
+            --user-message-bg: #005c99;
+            --assistant-message-bg: #2a2a3a;
+            --border-color: rgba(0, 191, 255, 0.2);
+            --status-connected-color: #00bfff;
+            --status-disconnected-color: #ff4136;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; }
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--background-color);
+            background-image:
+                radial-gradient(circle at 25% 25%, var(--secondary-glow-color), transparent 20%),
+                radial-gradient(circle at 75% 75%, var(--primary-glow-color), transparent 20%);
+            color: var(--text-color);
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
+            overflow: hidden;
         }
+
         .chat-container {
             width: 90%;
-            max-width: 700px;
-            height: 90vh;
-            background-color: #2b2b2b;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            height: 95vh;
+            max-height: 900px;
+            background: var(--container-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--secondary-glow-color) inset;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
+
         .chat-header {
-            background-color: #333;
-            padding: 15px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px 25px;
+            font-size: 1.3rem;
+            font-weight: 700;
             text-align: center;
-            border-bottom: 1px solid #444;
+            border-bottom: 1px solid var(--border-color);
+            text-shadow: 0 0 5px var(--primary-glow-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
         }
+
+        /* --- CHANGE #2: Status Dot Styling --- */
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            transition: background-color 0.5s, box-shadow 0.5s;
+        }
+        .status-connected {
+            background-color: var(--status-connected-color);
+            box-shadow: 0 0 8px var(--status-connected-color);
+        }
+        .status-disconnected {
+            background-color: var(--status-disconnected-color);
+            box-shadow: 0 0 8px var(--status-disconnected-color);
+        }
+
         .chat-box {
             flex-grow: 1;
             padding: 20px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
+            gap: 15px;
         }
+
+        .chat-box::-webkit-scrollbar { width: 8px; }
+        .chat-box::-webkit-scrollbar-track { background: transparent; }
+        .chat-box::-webkit-scrollbar-thumb {
+            background-color: var(--primary-glow-color);
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background-clip: content-box;
+        }
+
+        .message-wrapper {
+            display: flex;
+            gap: 12px;
+            max-width: 80%;
+            animation: fadeIn 0.5s ease-out;
+            align-items: flex-end; /* Vertically aligns icon and bubble */
+        }
+
+        .assistant-wrapper { align-self: flex-start; }
+
+        /* --- CHANGE #1: User Icon Position --- */
+        .user-wrapper {
+            align-self: flex-end;
+            /* This reverses the visual order of children (icon and message) */
+            flex-direction: row-reverse;
+        }
+
+        .message-wrapper .icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: var(--assistant-message-bg);
+        }
+        .user-wrapper .icon {
+            background-color: var(--user-message-bg);
+        }
+
         .message {
-            max-width: 75%;
             padding: 12px 18px;
             border-radius: 18px;
-            margin-bottom: 10px;
-            line-height: 1.4;
+            line-height: 1.5;
+            word-wrap: break-word;
         }
+
         .user-message {
-            background-color: #007bff;
+            background-color: var(--user-message-bg);
             color: white;
-            align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
+
         .assistant-message {
-            background-color: #444;
-            color: #e0e0e0;
-            align-self: flex-start;
+            background-color: var(--assistant-message-bg);
             border-bottom-left-radius: 4px;
         }
-        .thinking {
-            color: #888;
-            font-style: italic;
+
+        .error-message {
+            background-color: #721c24;
+            color: #f8d7da;
         }
+
+        .typing-indicator { display: flex; align-items: center; gap: 5px; }
+        .typing-indicator span {
+            width: 8px; height: 8px; border-radius: 50%;
+            background-color: var(--text-muted-color);
+            animation: pulse 1.4s infinite;
+        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+
         .chat-form {
-            display: flex;
-            padding: 15px;
-            border-top: 1px solid #444;
+            display: flex; padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            background: rgba(0, 0, 0, 0.3); gap: 10px;
         }
+
         #user-input {
-            flex-grow: 1;
-            padding: 12px;
-            border: 1px solid #555;
-            border-radius: 20px;
-            background-color: #3a3a3a;
-            color: #e0e0e0;
-            font-size: 1rem;
-            outline: none;
+            flex-grow: 1; padding: 12px 20px; border: none;
+            border-radius: 25px; background-color: #2a2a3a;
+            color: var(--text-color); font-size: 1rem; outline: none;
+            transition: box-shadow 0.3s;
         }
-        #user-input:focus {
-            border-color: #007bff;
+        #user-input:focus { box-shadow: 0 0 10px var(--primary-glow-color); }
+
+        #send-button {
+            background-color: var(--user-message-bg); color: white;
+            border: none; width: 50px; height: 50px; border-radius: 50%;
+            cursor: pointer; font-size: 1.2rem; display: flex; align-items: center;
+            justify-content: center; transition: background-color 0.2s, transform 0.2s;
         }
-        button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 0 20px;
-            margin-left: 10px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+        #send-button:hover:not(:disabled) { background-color: #007bff; transform: scale(1.1); }
+        #send-button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.7; }
     </style>
 </head>
 <body>
     <div class="chat-container">
-        <div class="chat-header">Jarvis - Smart Home Assistant</div>
+        <div class="chat-header">
+            Jarvis AI
+            <!-- CHANGE #2: Status dot element -->
+            <div id="status-indicator" class="status-dot"></div>
+        </div>
         <div class="chat-box" id="chat-box">
-            <div class="message assistant-message">Hello! How can I help you control your home today?</div>
+            <div class="message-wrapper assistant-wrapper">
+                <div class="icon"><i class="fas fa-robot"></i></div>
+                <div class="message assistant-message">Hello! I am Jarvis. System online and ready.</div>
+            </div>
         </div>
         <form class="chat-form" id="chat-form">
-            <input type="text" id="user-input" placeholder="Type your command here..." autocomplete="off">
-            <button type="submit">Send</button>
+            <input type="text" id="user-input" placeholder="Type your command..." autocomplete="off">
+            <button type="submit" id="send-button" title="Send Message">
+                <i class="fas fa-paper-plane"></i>
+            </button>
         </form>
     </div>
 
@@ -115,6 +227,21 @@
             const chatForm = document.getElementById('chat-form');
             const userInput = document.getElementById('user-input');
             const chatBox = document.getElementById('chat-box');
+            const sendButton = document.getElementById('send-button');
+            const statusIndicator = document.getElementById('status-indicator');
+
+            // --- CHANGE #2: Function to set connection status ---
+            function setStatus(status) {
+                statusIndicator.className = 'status-dot'; // Reset classes
+                if (status === 'connected') {
+                    statusIndicator.classList.add('status-connected');
+                } else {
+                    statusIndicator.classList.add('status-disconnected');
+                }
+            }
+
+            // Set initial status to connected
+            setStatus('connected');
 
             chatForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -123,42 +250,87 @@
 
                 addMessage(userMessage, 'user');
                 userInput.value = '';
+                userInput.focus();
+                sendButton.disabled = true;
 
-                const thinkingIndicator = addMessage('Jarvis is thinking...', 'assistant thinking');
+                showTypingIndicator();
 
                 try {
                     const response = await fetch('http://127.0.0.1:5001/chat', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ message: userMessage }),
                     });
 
-                    thinkingIndicator.remove(); // Remove thinking message
+                    hideTypingIndicator();
 
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        const errorData = await response.json().catch(() => null);
+                        const errorMessage = errorData?.error || `Network Error: ${response.statusText}`;
+                        throw new Error(errorMessage);
                     }
 
+                    // --- CHANGE #2: Set status to connected on success ---
+                    setStatus('connected');
                     const data = await response.json();
                     addMessage(data.reply, 'assistant');
 
                 } catch (error) {
-                    thinkingIndicator.remove();
-                    addMessage('Sorry, something went wrong. Please try again.', 'assistant');
+                    hideTypingIndicator();
+                    // --- CHANGE #2: Set status to disconnected on error ---
+                    setStatus('disconnected');
+                    addMessage(`Error: ${error.message}`, 'error');
                     console.error('Error:', error);
+                } finally {
+                    sendButton.disabled = false;
                 }
             });
 
-            function addMessage(text, sender) {
+            function addMessage(text, type) {
+                const wrapper = document.createElement('div');
+                const isUser = type === 'user';
+                wrapper.classList.add('message-wrapper', isUser ? 'user-wrapper' : 'assistant-wrapper');
+
+                const icon = document.createElement('div');
+                icon.classList.add('icon');
+                if (type !== 'error') {
+                    icon.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+                }
+
                 const messageElement = document.createElement('div');
-                messageElement.classList.add('message', `${sender}-message`);
+                messageElement.classList.add('message', `${type}-message`);
                 messageElement.textContent = text;
-                chatBox.appendChild(messageElement);
-                // Scroll to the bottom
+
+                // --- CHANGE #1: Simplified DOM structure. CSS will handle visual order. ---
+                wrapper.appendChild(icon);
+                wrapper.appendChild(messageElement);
+
+                chatBox.appendChild(wrapper);
+                scrollToBottom();
+            }
+
+            function showTypingIndicator() {
+                const wrapper = document.createElement('div');
+                wrapper.id = 'typing-indicator-wrapper';
+                wrapper.classList.add('message-wrapper', 'assistant-wrapper');
+
+                wrapper.innerHTML = `
+                    <div class="icon"><i class="fas fa-robot"></i></div>
+                    <div class="message assistant-message typing-indicator">
+                        <span></span><span></span><span></span>
+                    </div>
+                `;
+                chatBox.appendChild(wrapper);
+                scrollToBottom();
+            }
+
+            function hideTypingIndicator() {
+                const indicator = document.getElementById('typing-indicator-wrapper');
+                if (indicator) indicator.remove();
+            }
+
+            function scrollToBottom() {
                 chatBox.scrollTop = chatBox.scrollHeight;
-                return messageElement; // Return for later removal if needed
             }
         });
     </script>
