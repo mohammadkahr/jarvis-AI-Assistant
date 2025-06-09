@@ -1,4 +1,3 @@
-
 import os
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
@@ -15,14 +14,20 @@ from tools import (
     get_weather,
     get_latest_news,
     get_current_datetime,
-    change_tv_channel,
+    turn_on_ac,
+    turn_off_ac,
     turn_on_tv,
-    lock_door,
-    unlock_door,
-    open_blinds,
+    turn_off_tv,
+    change_tv_channel,
+    set_tv_volume,
+    activate_guest_mode,
+    stop_coffee_machine,
+    start_coffee_machine,
+    turn_off_all_lights,
     close_blinds,
-    activate_sleep_mode,
-    activate_guest_mode
+    open_blinds,
+    unlock_door,
+    lock_door
 )
 
 # Load API key
@@ -35,25 +40,32 @@ if not os.getenv("GROQ_API_KEY"):
 console = Console()
 
 # Initialize LLM
+# llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0)  # best model
 llm = ChatGroq(model="llama3-70b-8192", temperature=0)
 # llm = ChatGroq(model="llama3-8b-8192", temperature=0)   # faster
 
 # Tools list
 tools = [
-    toggle_light,               # Turns a specific room's light on or off
-    set_ac_temperature,         # Sets the AC temperature and turns it on if needed
-    get_device_status,          # Retrieves the current status of all or selected devices
-    get_weather,                # Gets the current weather for Tehran
-    get_latest_news,            # Fetches the top news headlines for a specified country
-    get_current_datetime,       # Returns the current date and time
-    change_tv_channel,          # Changes the TV channel in the living room
-    turn_on_tv,                 # Turns on the TV in the living room
-    lock_door,                  # Locks the door in the specified location
-    unlock_door,                # Unlocks the door in the specified location
-    open_blinds,                # Opens the blinds in the specified location
-    close_blinds,               # Closes the blinds in the specified location
-    activate_sleep_mode,        # Activates sleep mode: dims lights, lowers AC, etc.
-    activate_guest_mode         # Activates guest mode: adjusts lights, temperature, and opens blinds
+    toggle_light,
+    set_ac_temperature,
+    get_device_status,
+    get_weather,
+    get_latest_news,
+    get_current_datetime,
+    turn_on_ac,
+    turn_off_ac,
+    turn_on_tv,
+    turn_off_tv,
+    change_tv_channel,
+    set_tv_volume,
+    activate_guest_mode,
+    stop_coffee_machine,
+    start_coffee_machine,
+    turn_off_all_lights,
+    close_blinds,
+    open_blinds,
+    unlock_door,
+    lock_door
 ]
 
 # Prompt template
@@ -61,12 +73,13 @@ prompt_template = """
 You are a powerful and helpful smart home assistant. Your name is Jarvis.
 
 Follow these rules strictly:
-1. You MUST respond in the same language as the user's query (Persian or English).
+1. You MUST respond in the same language as the user's query (English or Persian).
 2. Be conversational and friendly, but get straight to the point.
 3. Think about which tool is the best fit for the user's request.
 4. If you are asked to do something you cannot do with your tools, politely say that you are unable to do so.
 5. After executing all necessary tools for a multi-part request, synthesize all the results into a single, final answer.
 6. If you already called a tool and received the answer, do not call the tool again. Just return a final response to the user.
+7. The default language is English. default city for weather is Tehran, default state for news is US.
 
 Here is the conversation history:
 {chat_history}

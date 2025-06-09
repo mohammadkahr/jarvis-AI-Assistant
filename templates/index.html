@@ -15,208 +15,70 @@
             --background-color: #0a0a0f;
             --container-bg: rgba(20, 20, 30, 0.75);
             --text-color: #e0e0e0;
-            --text-muted-color: #888;
             --user-message-bg: #005c99;
             --assistant-message-bg: #2a2a3a;
             --border-color: rgba(0, 191, 255, 0.2);
             --status-connected-color: #00bfff;
             --status-disconnected-color: #ff4136;
+            --mic-idle-color: #88a;
+            --mic-recording-color: #ff4136;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 0.2; } 50% { opacity: 1; } 100% { opacity: 0.2; } }
+        @keyframes micPulse { 0% { box-shadow: 0 0 5px 0px var(--mic-recording-color); } 50% { box-shadow: 0 0 15px 5px var(--mic-recording-color); } 100% { box-shadow: 0 0 5px 0px var(--mic-recording-color); } }
 
-        @keyframes pulse {
-            0% { opacity: 0.2; }
-            50% { opacity: 1; }
-            100% { opacity: 0.2; }
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: var(--background-color);
-            background-image:
-                radial-gradient(circle at 25% 25%, var(--secondary-glow-color), transparent 20%),
-                radial-gradient(circle at 75% 75%, var(--primary-glow-color), transparent 20%);
-            color: var(--text-color);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        .chat-container {
-            width: 90%;
-            max-width: 800px;
-            height: 95vh;
-            max-height: 900px;
-            background: var(--container-bg);
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--secondary-glow-color) inset;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-
-        .chat-header {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 15px 25px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-align: center;
-            border-bottom: 1px solid var(--border-color);
-            text-shadow: 0 0 5px var(--primary-glow-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        /* --- CHANGE #2: Status Dot Styling --- */
-        .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            transition: background-color 0.5s, box-shadow 0.5s;
-        }
-        .status-connected {
-            background-color: var(--status-connected-color);
-            box-shadow: 0 0 8px var(--status-connected-color);
-        }
-        .status-disconnected {
-            background-color: var(--status-disconnected-color);
-            box-shadow: 0 0 8px var(--status-disconnected-color);
-        }
-
-        .chat-box {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
+        body { font-family: 'Roboto', sans-serif; background-color: var(--background-color); background-image: radial-gradient(circle at 25% 25%, var(--secondary-glow-color), transparent 20%), radial-gradient(circle at 75% 75%, var(--primary-glow-color), transparent 20%); color: var(--text-color); margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; }
+        .chat-container { width: 90%; max-width: 800px; height: 95vh; max-height: 900px; background: var(--container-bg); border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--secondary-glow-color) inset; display: flex; flex-direction: column; overflow: hidden; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+        .chat-header { background: rgba(0, 0, 0, 0.3); padding: 15px 25px; font-size: 1.3rem; font-weight: 700; text-align: center; border-bottom: 1px solid var(--border-color); text-shadow: 0 0 5px var(--primary-glow-color); display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .status-dot { width: 12px; height: 12px; border-radius: 50%; transition: background-color 0.5s, box-shadow 0.5s; }
+        .status-connected { background-color: var(--status-connected-color); box-shadow: 0 0 8px var(--status-connected-color); }
+        .status-disconnected { background-color: var(--status-disconnected-color); box-shadow: 0 0 8px var(--status-disconnected-color); }
+        .chat-box { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         .chat-box::-webkit-scrollbar { width: 8px; }
         .chat-box::-webkit-scrollbar-track { background: transparent; }
-        .chat-box::-webkit-scrollbar-thumb {
-            background-color: var(--primary-glow-color);
-            border-radius: 10px;
-            border: 2px solid transparent;
-            background-clip: content-box;
-        }
-
-        .message-wrapper {
-            display: flex;
-            gap: 12px;
-            max-width: 80%;
-            animation: fadeIn 0.5s ease-out;
-            align-items: flex-end; /* Vertically aligns icon and bubble */
-        }
-
+        .chat-box::-webkit-scrollbar-thumb { background-color: var(--primary-glow-color); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+        .message-wrapper { display: flex; gap: 12px; max-width: 80%; animation: fadeIn 0.5s ease-out; align-items: flex-end; }
         .assistant-wrapper { align-self: flex-start; }
-
-        /* --- CHANGE #1: User Icon Position --- */
-        .user-wrapper {
-            align-self: flex-end;
-            /* This reverses the visual order of children (icon and message) */
-            flex-direction: row-reverse;
-        }
-
-        .message-wrapper .icon {
-            font-size: 1.5rem;
-            flex-shrink: 0;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            background-color: var(--assistant-message-bg);
-        }
-        .user-wrapper .icon {
-            background-color: var(--user-message-bg);
-        }
-
-        .message {
-            padding: 12px 18px;
-            border-radius: 18px;
-            line-height: 1.5;
-            word-wrap: break-word;
-        }
-
-        .user-message {
-            background-color: var(--user-message-bg);
-            color: white;
-            border-bottom-right-radius: 4px;
-        }
-
-        .assistant-message {
-            background-color: var(--assistant-message-bg);
-            border-bottom-left-radius: 4px;
-        }
-
-        .error-message {
-            background-color: #721c24;
-            color: #f8d7da;
-        }
-
+        .user-wrapper { align-self: flex-end; flex-direction: row-reverse; }
+        .message-wrapper .icon { font-size: 1.5rem; flex-shrink: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background-color: var(--assistant-message-bg); }
+        .user-wrapper .icon { background-color: var(--user-message-bg); }
+        .message { padding: 12px 18px; border-radius: 18px; line-height: 1.5; word-wrap: break-word; }
+        .user-message { background-color: var(--user-message-bg); color: white; border-bottom-right-radius: 4px; }
+        .assistant-message { background-color: var(--assistant-message-bg); border-bottom-left-radius: 4px; }
+        .error-message { background-color: #721c24; color: #f8d7da; border-bottom-left-radius: 4px; }
         .typing-indicator { display: flex; align-items: center; gap: 5px; }
-        .typing-indicator span {
-            width: 8px; height: 8px; border-radius: 50%;
-            background-color: var(--text-muted-color);
-            animation: pulse 1.4s infinite;
-        }
+        .typing-indicator span { width: 8px; height: 8px; border-radius: 50%; background-color: var(--text-muted-color); animation: pulse 1.4s infinite; }
         .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
         .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-
-        .chat-form {
-            display: flex; padding: 15px 20px;
-            border-top: 1px solid var(--border-color);
-            background: rgba(0, 0, 0, 0.3); gap: 10px;
-        }
-
-        #user-input {
-            flex-grow: 1; padding: 12px 20px; border: none;
-            border-radius: 25px; background-color: #2a2a3a;
-            color: var(--text-color); font-size: 1rem; outline: none;
-            transition: box-shadow 0.3s;
-        }
+        .chat-form { display: flex; padding: 15px 20px; border-top: 1px solid var(--border-color); background: rgba(0, 0, 0, 0.3); gap: 10px; }
+        #user-input { flex-grow: 1; padding: 12px 20px; border: none; border-radius: 25px; background-color: #2a2a3a; color: var(--text-color); font-size: 1rem; outline: none; transition: box-shadow 0.3s; }
         #user-input:focus { box-shadow: 0 0 10px var(--primary-glow-color); }
-
-        #send-button {
-            background-color: var(--user-message-bg); color: white;
-            border: none; width: 50px; height: 50px; border-radius: 50%;
-            cursor: pointer; font-size: 1.2rem; display: flex; align-items: center;
-            justify-content: center; transition: background-color 0.2s, transform 0.2s;
-        }
-        #send-button:hover:not(:disabled) { background-color: #007bff; transform: scale(1.1); }
-        #send-button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.7; }
+        .form-button { background-color: var(--user-message-bg); color: white; border: none; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, transform 0.2s, box-shadow 0.3s; flex-shrink: 0; }
+        .form-button:hover:not(:disabled) { background-color: #007bff; transform: scale(1.1); }
+        .form-button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.7; }
+        #mic-button { background-color: var(--mic-idle-color); }
+        #mic-button.recording { background-color: var(--mic-recording-color); animation: micPulse 1.5s infinite; }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
             Jarvis AI
-            <!-- CHANGE #2: Status dot element -->
             <div id="status-indicator" class="status-dot"></div>
         </div>
         <div class="chat-box" id="chat-box">
             <div class="message-wrapper assistant-wrapper">
                 <div class="icon"><i class="fas fa-robot"></i></div>
-                <div class="message assistant-message">Hello! I am Jarvis. System online and ready.</div>
+                <div class="message assistant-message">Hello! I am Jarvis. System online and ready. How can I assist you?</div>
             </div>
         </div>
         <form class="chat-form" id="chat-form">
-            <input type="text" id="user-input" placeholder="Type your command..." autocomplete="off">
-            <button type="submit" id="send-button" title="Send Message">
+            <input type="text" id="user-input" placeholder="Type or click the mic to talk..." autocomplete="off">
+            <button type="button" id="mic-button" class="form-button" title="Start/Stop Recording">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button type="submit" id="send-button" class="form-button" title="Send Message">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </form>
@@ -229,20 +91,131 @@
             const chatBox = document.getElementById('chat-box');
             const sendButton = document.getElementById('send-button');
             const statusIndicator = document.getElementById('status-indicator');
+            const micButton = document.getElementById('mic-button');
 
-            // --- CHANGE #2: Function to set connection status ---
-            function setStatus(status) {
-                statusIndicator.className = 'status-dot'; // Reset classes
-                if (status === 'connected') {
-                    statusIndicator.classList.add('status-connected');
+            let mediaRecorder;
+            let audioChunks = [];
+            let isRecording = false;
+
+            // --- Voice Synthesis (TTS) Setup ---
+            let ttsVoices = [];
+            const populateVoiceList = () => {
+                ttsVoices = window.speechSynthesis.getVoices();
+            };
+            populateVoiceList();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = populateVoiceList;
+            }
+
+            function speak(text) {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    const isPersian = /[\u0600-\u06FF]/.test(text);
+
+                    let voiceToUse = null;
+                    if (isPersian) {
+                        voiceToUse = ttsVoices.find(voice => voice.lang.toLowerCase().startsWith('fa')) || ttsVoices.find(voice => voice.name.toLowerCase().includes('dari'));
+                    } else {
+                        voiceToUse = ttsVoices.find(voice => voice.lang.toLowerCase().startsWith('en-us')) || ttsVoices.find(voice => voice.lang.toLowerCase().startsWith('en-gb')) || ttsVoices.find(voice => voice.lang.toLowerCase().startsWith('en'));
+                    }
+
+                    if (voiceToUse) {
+                        utterance.voice = voiceToUse;
+                    }
+
+                    utterance.onstart = () => console.log('TTS started.');
+                    utterance.onend = () => console.log('TTS finished.');
+                    utterance.onerror = (e) => console.error('TTS error:', e);
+
+                    window.speechSynthesis.speak(utterance);
                 } else {
-                    statusIndicator.classList.add('status-disconnected');
+                    console.log('Speech Synthesis not supported in this browser.');
                 }
             }
 
-            // Set initial status to connected
+            // --- Status Indicator ---
+            function setStatus(status) {
+                statusIndicator.className = 'status-dot';
+                statusIndicator.classList.add(status === 'connected' ? 'status-connected' : 'status-disconnected');
+            }
             setStatus('connected');
 
+            // --- Microphone Recording Logic ---
+            micButton.addEventListener('click', async () => {
+                if (isRecording) {
+                    stopRecording();
+                } else {
+                    await startRecording();
+                }
+            });
+
+            async function startRecording() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                    mediaRecorder.start();
+                    isRecording = true;
+                    audioChunks = [];
+                    micButton.classList.add('recording');
+                    micButton.querySelector('i').className = 'fas fa-stop';
+                    userInput.placeholder = "Listening...";
+                    setButtonsDisabled(true, true);
+
+                    mediaRecorder.addEventListener("dataavailable", event => {
+                        audioChunks.push(event.data);
+                    });
+
+                    mediaRecorder.addEventListener("stop", () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                        transcribeAudio(audioBlob);
+                        stream.getTracks().forEach(track => track.stop());
+                    });
+                } catch (error) {
+                    console.error("Error accessing microphone:", error);
+                    addMessage("Microphone access was denied. Please allow access in your browser settings.", 'error');
+                }
+            }
+
+            function stopRecording() {
+                if (mediaRecorder && isRecording) {
+                    mediaRecorder.stop();
+                    isRecording = false;
+                    micButton.classList.remove('recording');
+                    micButton.querySelector('i').className = 'fas fa-microphone';
+                    userInput.placeholder = "Processing speech...";
+                }
+            }
+
+            async function transcribeAudio(audioBlob) {
+                const formData = new FormData();
+                formData.append('audio', audioBlob, 'recording.webm');
+
+                try {
+                    const response = await fetch('http://127.0.0.1:5001/transcribe', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) throw new Error('Transcription failed.');
+
+                    const data = await response.json();
+                    userInput.value = data.text;
+                    if(data.text) {
+                        chatForm.requestSubmit();
+                    } else {
+                        addMessage("I didn't hear anything. Please try again.", 'error');
+                        setButtonsDisabled(false);
+                    }
+                } catch (error) {
+                    console.error("Error during transcription:", error);
+                    addMessage("Sorry, I couldn't understand that. Please try again.", 'error');
+                    setButtonsDisabled(false);
+                } finally {
+                     userInput.placeholder = "Type or click the mic to talk...";
+                }
+            }
+
+            // --- Chat Submission Logic ---
             chatForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const userMessage = userInput.value.trim();
@@ -251,8 +224,7 @@
                 addMessage(userMessage, 'user');
                 userInput.value = '';
                 userInput.focus();
-                sendButton.disabled = true;
-
+                setButtonsDisabled(true);
                 showTypingIndicator();
 
                 try {
@@ -263,28 +235,31 @@
                     });
 
                     hideTypingIndicator();
-
                     if (!response.ok) {
                         const errorData = await response.json().catch(() => null);
-                        const errorMessage = errorData?.error || `Network Error: ${response.statusText}`;
-                        throw new Error(errorMessage);
+                        throw new Error(errorData?.error || `Network Error: ${response.statusText}`);
                     }
 
-                    // --- CHANGE #2: Set status to connected on success ---
                     setStatus('connected');
                     const data = await response.json();
                     addMessage(data.reply, 'assistant');
+                    speak(data.reply);
 
                 } catch (error) {
                     hideTypingIndicator();
-                    // --- CHANGE #2: Set status to disconnected on error ---
                     setStatus('disconnected');
                     addMessage(`Error: ${error.message}`, 'error');
                     console.error('Error:', error);
                 } finally {
-                    sendButton.disabled = false;
+                    setButtonsDisabled(false);
                 }
             });
+
+            function setButtonsDisabled(isDisabled, isRecording = false) {
+                sendButton.disabled = isDisabled;
+                micButton.disabled = isDisabled && !isRecording;
+                userInput.disabled = isDisabled;
+            }
 
             function addMessage(text, type) {
                 const wrapper = document.createElement('div');
@@ -293,18 +268,18 @@
 
                 const icon = document.createElement('div');
                 icon.classList.add('icon');
-                if (type !== 'error') {
-                    icon.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-                }
+                icon.innerHTML = isUser ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
 
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', `${type}-message`);
                 messageElement.textContent = text;
 
-                // --- CHANGE #1: Simplified DOM structure. CSS will handle visual order. ---
+                if (type === 'error') {
+                   icon.innerHTML = '<i class="fas fa-exclamation-triangle"></i>'
+                }
+
                 wrapper.appendChild(icon);
                 wrapper.appendChild(messageElement);
-
                 chatBox.appendChild(wrapper);
                 scrollToBottom();
             }
@@ -313,13 +288,7 @@
                 const wrapper = document.createElement('div');
                 wrapper.id = 'typing-indicator-wrapper';
                 wrapper.classList.add('message-wrapper', 'assistant-wrapper');
-
-                wrapper.innerHTML = `
-                    <div class="icon"><i class="fas fa-robot"></i></div>
-                    <div class="message assistant-message typing-indicator">
-                        <span></span><span></span><span></span>
-                    </div>
-                `;
+                wrapper.innerHTML = `<div class="icon"><i class="fas fa-robot"></i></div><div class="message assistant-message typing-indicator"><span></span><span></span><span></span></div>`;
                 chatBox.appendChild(wrapper);
                 scrollToBottom();
             }
